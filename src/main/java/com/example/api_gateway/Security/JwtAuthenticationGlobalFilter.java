@@ -63,16 +63,20 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
             "/api/auth/login",
             "/api/auth/verify",
             "/api/auth/verify-jwt",
-            "/api/users/register",
+            "/api/auth/tokens", // POST /api/auth/tokens - verify and get JWT
             "/api/quiz/images", // Statiska quiz images
             "/api/admin/auth/login", // AdminService - Admin login
             "/api/admin/auth/health", // AdminService - Health check
-            "/api/swish/callback" // PaymentService - Swish callback
+            "/api/webhooks/swish" // PaymentService - Swish callback
+    );
+
+    // Public POST endpoints (endast POST, övriga metoder kräver JWT)
+    private static final List<String> PUBLIC_POST_PATHS = Arrays.asList(
+            "/api/users" // POST /api/users - User registration
     );
 
     // Public GET endpoints (read-only, no JWT needed)
-    private static final List<String> PUBLIC_GET_PATHS = Arrays.asList(
-    );
+    private static final List<String> PUBLIC_GET_PATHS = Arrays.asList();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -88,7 +92,13 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
             return chain.filter(stripUserHeaders(exchange));
         }
 
-        // STEG 2: Kolla om endpoint är public för GET requests
+        // STEG 2: Kolla om endpoint är public för POST requests
+        if (isPublicPostPath(path, request.getMethod())) {
+            log.debug("✅ Public POST endpoint - No JWT required: {} {}", request.getMethod(), path);
+            return chain.filter(stripUserHeaders(exchange));
+        }
+
+        // STEG 3: Kolla om endpoint är public för GET requests
         if (isPublicGetPath(path, request.getMethod())) {
             log.debug("✅ Public GET endpoint - No JWT required: {} {}", request.getMethod(), path);
             return chain.filter(stripUserHeaders(exchange));
@@ -153,6 +163,16 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
      */
     private boolean isPublicPath(String path) {
         return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+    }
+
+    /**
+     * Kollar om path är en public endpoint för POST requests
+     */
+    private boolean isPublicPostPath(String path, HttpMethod method) {
+        if (method != HttpMethod.POST) {
+            return false; // Endast POST är public
+        }
+        return PUBLIC_POST_PATHS.stream().anyMatch(path::startsWith);
     }
 
     /**

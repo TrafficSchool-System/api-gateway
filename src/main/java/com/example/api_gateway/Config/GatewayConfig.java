@@ -47,8 +47,84 @@ public class GatewayConfig {
         public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
                 return builder.routes()
                                 // =========================
-                                // ADMIN SERVICE - HÖGST PRIORITET
+                                // ADMIN ROUTES - MER SPECIFIKA FÖRST!
                                 // =========================
+
+                                // Admin User Statistics (UserService - enkla räkningar)
+                                .route("admin-user-statistics", r -> r
+                                                .path("/api/admin/users/statistics")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .retry(config -> config
+                                                                                .setRetries(3)
+                                                                                .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
+                                                .uri("lb://user-service"))
+
+                                // Admin User DELETE (UserService - direct access for CRUD)
+                                .route("admin-user-delete", r -> r
+                                                .method(org.springframework.http.HttpMethod.DELETE)
+                                                .and()
+                                                .path("/api/admin/users/**")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .retry(config -> config
+                                                                                .setRetries(3)
+                                                                                .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
+                                                .uri("lb://user-service"))
+
+                                // Admin User UPDATE (UserService - direct access for CRUD)
+                                .route("admin-user-update", r -> r
+                                                .method(org.springframework.http.HttpMethod.PUT)
+                                                .and()
+                                                .path("/api/admin/users/**")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .retry(config -> config
+                                                                                .setRetries(3)
+                                                                                .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
+                                                .uri("lb://user-service"))
+
+                                // Admin User Management READ (AdminService - aggregerad data)
+                                .route("admin-users", r -> r
+                                                .path("/api/admin/users/**")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .retry(config -> config
+                                                                                .setRetries(3)
+                                                                                .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
+                                                .uri("lb://admin-service"))
+
+                                // Admin Exam Management (ExamService)
+                                .route("admin-exams", r -> r
+                                                .path("/api/admin/exams/**")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .retry(config -> config
+                                                                                .setRetries(3)
+                                                                                .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
+                                                .uri("lb://exam-service"))
+
+                                // Admin Quiz Management (QuizService)
+                                .route("admin-quizzes", r -> r
+                                                .path("/api/admin/quizzes/**")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .retry(config -> config
+                                                                                .setRetries(3)
+                                                                                .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
+                                                .uri("lb://quiz-service"))
+
+                                // Admin Payment Management (PaymentService)
+                                .route("admin-payments", r -> r
+                                                .path("/api/admin/payments/**", "/api/admin/packages/**")
+                                                .filters(f -> f
+                                                                .stripPrefix(0)
+                                                                .retry(config -> config
+                                                                                .setRetries(3)
+                                                                                .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
+                                                .uri("lb://payment-service"))
+
+                                // Admin Aggregation Service (AdminService) - SIST!
                                 .route("admin-service", r -> r
                                                 .path("/api/admin/**")
                                                 .filters(f -> f
