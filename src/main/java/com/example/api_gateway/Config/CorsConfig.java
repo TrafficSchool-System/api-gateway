@@ -30,11 +30,20 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // ALLOWED ORIGINS - lägg till fler vid behov
-        config.setAllowedOrigins(Arrays.asList(
+        String frontendUrl = System.getenv("FRONTEND_URL"); 
+        if (frontendUrl != null && !frontendUrl.isEmpty()) {
+            // Produktion/Staging - använd konfigurerad URL
+            config.setAllowedOrigins(Arrays.asList(frontendUrl));
+            System.out.println("CORS: Using configured frontend URL: " + frontendUrl); 
+        } else {
+            // Development - använd localhost
+            config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173", // Vite dev server (standard)
-                "http://localhost:3000", // Alternative React dev server
-                "http://localhost:4173" // Vite preview server
-        ));
+            "http://localhost:3000", // Alternative React dev server
+            "http://localhost:4173"  // Vite preview server
+            ));
+            System.out.println("CORS: Using localhost origins for development");
+        }
 
         // ALLOWED METHODS - tillåt alla HTTP-metoder
         config.addAllowedMethod("GET");
