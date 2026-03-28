@@ -73,6 +73,13 @@
 			<version>4.0.0</version>
 		</dependency>
 
+		<!-- Rate Limiting med Bucket4j-->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.5.0</version>
+		</dependency>
+		
 		<!-- Actuator for health checks and monitoring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
