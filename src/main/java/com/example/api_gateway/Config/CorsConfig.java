@@ -29,18 +29,19 @@ public class CorsConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // ALLOWED ORIGINS - lägg till fler vid behov
-        String frontendUrl = System.getenv("FRONTEND_URL"); 
+        // ALLOWED ORIGINS - använd setAllowedOriginPatterns istället för
+        // setAllowedOrigins
+        String frontendUrl = System.getenv("FRONTEND_URL");
         if (frontendUrl != null && !frontendUrl.isEmpty()) {
             // Produktion/Staging - använd konfigurerad URL
-            config.setAllowedOrigins(Arrays.asList(frontendUrl));
-            System.out.println("CORS: Using configured frontend URL: " + frontendUrl); 
+            config.setAllowedOriginPatterns(Arrays.asList(frontendUrl));
+            System.out.println("CORS: Using configured frontend URL: " + frontendUrl);
         } else {
             // Development - använd localhost
-            config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173", // Vite dev server (standard)
-            "http://localhost:3000", // Alternative React dev server
-            "http://localhost:4173"  // Vite preview server
+            config.setAllowedOriginPatterns(Arrays.asList(
+                    "http://localhost:5173", // Vite dev server (standard)
+                    "http://localhost:3000", // Alternative React dev server
+                    "http://localhost:4173" // Vite preview server
             ));
             System.out.println("CORS: Using localhost origins for development");
         }
