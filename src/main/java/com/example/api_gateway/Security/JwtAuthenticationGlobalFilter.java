@@ -64,7 +64,8 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
             "/api/auth/verify",
             "/api/auth/verify-jwt",
             "/api/auth/tokens", // POST /api/auth/tokens - verify and get JWT
-            "/api/quiz/images", // Statiska quiz images
+            "/api/quizzes/images", // Quiz images - accessible without JWT
+            "/api/exams/images", // Exam images - accessible without JWT
             "/api/admin/auth/login", // AdminService - Admin login
             "/api/admin/auth/health", // AdminService - Health check
             "/api/webhooks/swish" // PaymentService - Swish callback
