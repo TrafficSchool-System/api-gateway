@@ -14,17 +14,18 @@ import org.springframework.context.annotation.Profile;
  * RAILWAY-SPECIFIC GATEWAY CONFIGURATION
  * ==========================================
  * 
- * Railway deployment använder DIREKT service-to-service kommunikation
- * via Railway's privata nätverk (.railway.internal) istället för Eureka.
+ * Railway deployment använder Eureka service discovery för routing.
+ * Services registreras i Eureka och Gateway använder lb:// (load balancer)
+ * prefix.
  * 
  * IMPORTANT: This config is ONLY active when SPRING_PROFILES_ACTIVE=railway
  * 
- * Services använder Railway's interna DNS:
- * - userservice.railway.internal:8081
- * - adminservice.railway.internal:8084
- * - paymentservice.railway.internal:8085
- * - quizservice.railway.internal:8082
- * - examservice.railway.internal:8083
+ * Services via Eureka load balancing:
+ * - lb://USER-SERVICE (port 8081)
+ * - lb://ADMIN-SERVICE (port 8082)
+ * - lb://PAYMENT-SERVICE (port 8083)
+ * - lb://EXAM-SERVICE (port 8084)
+ * - lb://QUIZ-SERVICE (port 8085)
  */
 @Configuration
 @Profile("railway")
@@ -32,30 +33,29 @@ public class RailwayGatewayConfig {
 
         private static final Logger log = LoggerFactory.getLogger(RailwayGatewayConfig.class);
 
-        @Value("${services.user-service.url:http://userservice.railway.internal:8081}")
+        @Value("${services.user-service.url:lb://USER-SERVICE}")
         private String userServiceUrl;
 
-        @Value("${services.admin-service.url:http://adminservice.railway.internal:8084}")
+        @Value("${services.admin-service.url:lb://ADMIN-SERVICE}")
         private String adminServiceUrl;
 
-        @Value("${services.payment-service.url:http://paymentservice.railway.internal:8085}")
+        @Value("${services.payment-service.url:lb://PAYMENT-SERVICE}")
         private String paymentServiceUrl;
 
-        @Value("${services.quiz-service.url:http://quizservice.railway.internal:8082}")
+        @Value("${services.quiz-service.url:lb://QUIZ-SERVICE}")
         private String quizServiceUrl;
 
-        @Value("${services.exam-service.url:http://examservice.railway.internal:8083}")
+        @Value("${services.exam-service.url:lb://EXAM-SERVICE}")
         private String examServiceUrl;
 
         /**
-         * Railway Route Configuration med direkta service URLs
+         * Railway Route Configuration med Eureka load balancing
          * 
-         * VIKTIGT: Använder INTE Eureka load balancing (lb://)
-         * Använder istället direkta HTTP URLs till Railway's privata nätverk
+         * VIKTIGT: Använder Eureka load balancing (lb://) för service discovery
          */
         @Bean
         public RouteLocator railwayRouteLocator(RouteLocatorBuilder builder) {
-                log.info("🚂 [Railway Gateway Config] Initializing with direct service URLs:");
+                log.info("🚂 [Railway Gateway Config] Initializing with Eureka load balancing:");
                 log.info("  - User Service: {}", userServiceUrl);
                 log.info("  - Admin Service: {}", adminServiceUrl);
                 log.info("  - Payment Service: {}", paymentServiceUrl);
