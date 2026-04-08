@@ -64,6 +64,9 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
     @Value("${service.api.key}")
     private String serviceApiKey;
 
+    @Value("${services.user-service.url:http://USER-SERVICE}")
+    private String userServiceUrl;
+
     // ==========================================
     // KONFIGURATION - SKYDDADE ENDPOINTS
     // ==========================================
@@ -172,9 +175,12 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
      * @return Mono<Boolean> - true om användaren har aktivt abonnemang
      */
     private Mono<Boolean> checkSubscription(Long userId) {
+        String uri = userServiceUrl + "/api/internal/users/{userId}/subscription-status";
+        log.debug("🔗 Calling UserService at: {}", uri);
+
         return webClientBuilder.build()
                 .get()
-                .uri("http://USER-SERVICE/api/internal/users/{userId}/subscription-status", userId)
+                .uri(uri, userId)
                 .header("X-Internal-API-Key", serviceApiKey)
                 .retrieve()
                 .bodyToMono(UserSubscriptionResponse.class)
