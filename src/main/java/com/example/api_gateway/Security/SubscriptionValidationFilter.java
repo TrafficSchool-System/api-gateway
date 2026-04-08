@@ -85,7 +85,8 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
      * Exempel: statiska bilder, public data, admin-endpoints
      */
     private static final List<String> SUBSCRIPTION_EXEMPT_PATHS = Arrays.asList(
-            "/api/quiz/images", // Statiska quiz-bilder (public)
+            "/api/quizzes/images", // Statiska quiz-bilder (public)
+            "/api/exams/images", // Statiska exam-bilder (public)
             "/api/admin" // Admin endpoints (admin har alltid access)
     );
 
