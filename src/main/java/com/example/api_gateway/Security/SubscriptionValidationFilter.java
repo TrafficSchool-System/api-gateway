@@ -64,7 +64,7 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
     @Value("${service.api.key}")
     private String serviceApiKey;
 
-    @Value("${services.user-service.url:http://USER-SERVICE}")
+    @Value("${services.user-service.url:http://USER-SERVICE:8081}")
     private String userServiceUrl;
 
     // ==========================================
