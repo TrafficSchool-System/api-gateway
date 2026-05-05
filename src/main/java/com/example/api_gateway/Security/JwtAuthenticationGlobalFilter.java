@@ -130,7 +130,7 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
             String userEmail = jwtUtil.extractEmail(token);
             String userRole = jwtUtil.extractRole(token);
 
-            log.info("✅ JWT validated - User: {}, Role: {}, Path: {}", userEmail, userRole, path);
+            log.debug("JWT validated: userId={} role={} path={}", userId, userRole, path);
 
             // STEG 7: Skapa muterad request med nya headers för downstream services
             ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()

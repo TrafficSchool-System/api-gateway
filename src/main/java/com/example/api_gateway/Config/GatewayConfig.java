@@ -200,7 +200,7 @@ public class GatewayConfig {
         public GlobalFilter requestLoggingFilter() {
                 return (exchange, chain) -> {
                         var request = exchange.getRequest();
-                        log.info("🌐 [Gateway] {} {} from {}",
+                        log.debug("[Gateway] {} {} from {}",
                                         request.getMethod(),
                                         request.getURI(),
                                         request.getRemoteAddress());
@@ -221,7 +221,7 @@ public class GatewayConfig {
                         return chain.filter(exchange).then(Mono.fromRunnable(() -> {
                                 var response = exchange.getResponse();
                                 var request = exchange.getRequest();
-                                log.info("✅ [Gateway] {} {} → {}",
+                                log.debug("[Gateway] {} {} -> {}",
                                                 request.getMethod(),
                                                 request.getURI().getPath(),
                                                 response.getStatusCode());

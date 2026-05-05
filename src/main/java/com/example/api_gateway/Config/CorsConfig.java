@@ -1,5 +1,7 @@
 package com.example.api_gateway.Config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,6 +27,8 @@ import java.util.Arrays;
 @Configuration
 public class CorsConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(CorsConfig.class);
+
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
@@ -35,7 +39,7 @@ public class CorsConfig {
         if (frontendUrl != null && !frontendUrl.isEmpty()) {
             // Produktion/Staging - använd konfigurerad URL
             config.setAllowedOriginPatterns(Arrays.asList(frontendUrl));
-            System.out.println("CORS: Using configured frontend URL: " + frontendUrl);
+            log.info("CORS: Using configured frontend URL: {}", frontendUrl);
         } else {
             // Development - använd localhost
             config.setAllowedOriginPatterns(Arrays.asList(
@@ -43,7 +47,7 @@ public class CorsConfig {
                     "http://localhost:3000", // Alternative React dev server
                     "http://localhost:4173" // Vite preview server
             ));
-            System.out.println("CORS: Using localhost origins for development");
+            log.debug("CORS: Using localhost origins for development");
         }
 
         // ALLOWED METHODS - tillåt alla HTTP-metoder

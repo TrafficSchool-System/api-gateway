@@ -76,8 +76,8 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
      * Alla requests till dessa paths kommer att valideras
      */
     private static final List<String> SUBSCRIPTION_REQUIRED_PATHS = Arrays.asList(
-            "/api/quiz", // Quiz endpoints
-            "/api/exam" // Exam endpoints
+            "/api/quizzes", // Quiz endpoints (med 's' - /api/quizzes/sessions, etc.)
+            "/api/exams" // Exam endpoints (med 's' - /api/exams, /api/exams/statistics, etc.)
     );
 
     /**
@@ -118,18 +118,18 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
 
         // STEG 3: Admin har alltid access (skip subscription check)
         if ("ADMIN".equals(userRole)) {
-            log.info("✅ Admin access granted - skipping subscription check for path: {}", path);
+            log.debug("Admin access granted: path={}", path);
             return chain.filter(exchange);
         }
 
         Long userId = Long.parseLong(userIdHeader);
-        log.info("🔍 Checking subscription for userId={}, path={}", userId, path);
+        log.debug("Checking subscription: userId={} path={}", userId, path);
 
         // STEG 4: Anropa UserService för att kolla subscription
         return checkSubscription(userId)
                 .flatMap(hasSubscription -> {
                     if (hasSubscription) {
-                        log.info("✅ Subscription valid - allowing access to: {}", path);
+                        log.debug("Subscription valid: userId={} path={}", userId, path);
                         return chain.filter(exchange);
                     } else {
                         log.warn("⛔ FORBIDDEN - No active subscription for userId={}, path={}", userId, path);
@@ -176,12 +176,12 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
      * @return Mono<Boolean> - true om användaren har aktivt abonnemang
      */
     private Mono<Boolean> checkSubscription(Long userId) {
-        String uri = userServiceUrl + "/api/internal/users/{userId}/subscription-status";
+        String uri = userServiceUrl + "/api/internal/users/" + userId + "/subscription-status";
         log.debug("🔗 Calling UserService at: {}", uri);
 
         return webClientBuilder.build()
                 .get()
-                .uri(uri, userId)
+                .uri(uri)
                 .header("X-Internal-API-Key", serviceApiKey)
                 .retrieve()
                 .bodyToMono(UserSubscriptionResponse.class)
@@ -270,33 +270,29 @@ public class SubscriptionValidationFilter implements GlobalFilter, Ordered {
      * Matchar UserResponseDTO från UserService
      */
     private static class UserSubscriptionResponse {
-        private Long id;
-        private String email;
-        private boolean hasActiveSubscription;
+        private Long userId;
+        private boolean active;
 
         // Getters and setters
-        public Long getId() {
-            return id;
+        public Long getUserId() {
+            return userId;
         }
 
-        public void setId(Long id) {
-            this.id = id;
+        public void setUserId(Long userId) {
+            this.userId = userId;
         }
 
-        public String getEmail() {
-            return email;
+        public boolean isActive() {
+            return active;
         }
 
-        public void setEmail(String email) {
-            this.email = email;
+        public void setActive(boolean active) {
+            this.active = active;
         }
 
+        // Used by .map(UserSubscriptionResponse::isHasActiveSubscription) call
         public boolean isHasActiveSubscription() {
-            return hasActiveSubscription;
-        }
-
-        public void setHasActiveSubscription(boolean hasActiveSubscription) {
-            this.hasActiveSubscription = hasActiveSubscription;
+            return active;
         }
     }
 }
