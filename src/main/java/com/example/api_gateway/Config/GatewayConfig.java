@@ -155,7 +155,8 @@ public class GatewayConfig {
                                 // PAYMENT SERVICE
                                 // =========================
                                 .route("payment-service", r -> r
-                                                .path("/api/payments/**", "/api/packages/**", "/api/swish/**")
+                                                .path("/api/payments/**", "/api/packages/**", "/api/swish/**",
+                                                                "/api/webhooks/**")
                                                 .filters(f -> f
                                                                 .stripPrefix(0)
                                                                 .retry(config -> config
