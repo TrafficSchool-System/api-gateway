@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
  * Centraliserad routing konfiguration för alla microservices.
  * 
  * VIKTIGT: Denna config är ENDAST aktiv för lokal utveckling (default profil)
- * För Railway deployment, använd RailwayGatewayConfig istället!
+ * För Produktion deployment, använd ProductionGatewayConfig istället!
  * 
  * ARKITEKTUR:
  * Client → API Gateway (8080) → Eureka → Microservices
@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
  * - exam-service (8083) - Exams
  */
 @Configuration
-@Profile("!railway") // Active only when NOT using railway profile
+@Profile("local") 
 public class GatewayConfig {
 
         private static final Logger log = LoggerFactory.getLogger(GatewayConfig.class);

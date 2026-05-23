@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 
 /**
  * ==========================================
- * RAILWAY-SPECIFIC GATEWAY CONFIGURATION
+ * Production GATEWAY CONFIGURATION (Azure Container Apps)
  * ==========================================
  * 
  * Railway deployment använder Eureka service discovery för routing.
@@ -28,10 +28,10 @@ import org.springframework.context.annotation.Profile;
  * - lb://QUIZ-SERVICE (port 8085)
  */
 @Configuration
-@Profile("railway")
-public class RailwayGatewayConfig {
+@Profile("prod")
+public class ProductionGatewayConfig {
 
-        private static final Logger log = LoggerFactory.getLogger(RailwayGatewayConfig.class);
+        private static final Logger log = LoggerFactory.getLogger(ProductionGatewayConfig.class);
 
         @Value("${services.user-service.url:lb://USER-SERVICE}")
         private String userServiceUrl;
@@ -54,8 +54,8 @@ public class RailwayGatewayConfig {
          * VIKTIGT: Använder Eureka load balancing (lb://) för service discovery
          */
         @Bean
-        public RouteLocator railwayRouteLocator(RouteLocatorBuilder builder) {
-                log.info("🚂 [Railway Gateway Config] Initializing with Eureka load balancing:");
+        public RouteLocator productionRouteLocator(RouteLocatorBuilder builder) {
+                log.info("🚂 [Production Gateway Config] Initializing with Eureka load balancing:");
                 log.info("  - User Service: {}", userServiceUrl);
                 log.info("  - Admin Service: {}", adminServiceUrl);
                 log.info("  - Payment Service: {}", paymentServiceUrl);
