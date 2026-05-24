@@ -49,3 +49,10 @@ jobs:
             --target-port 8080 \
             --ingress external \
             --env-vars "SPRING_PROFILES_ACTIVE=prod" "JWT_SECRET=${{ secrets.JWT_SECRET }}" "SERVICE_API_KEY=${{ secrets.SERVICE_API_KEY }}" "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" "EUREKA_URL=http://eureka-server/eureka/"
+
+      - name: Sätt minimum 1 replik (förhindra scale-to-zero)
+        run: |
+          az containerapp update \
+            --name ${{ env.APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --min-replicas 1
