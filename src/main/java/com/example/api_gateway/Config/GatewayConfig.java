@@ -77,6 +77,15 @@ public class GatewayConfig {
                                                                                 .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
                                                 .uri("lb://user-service"))
 
+                                // Admin Extend Subscription (AdminService)
+                                .route("admin-extend-subscription", r -> r
+                                                .method(org.springframework.http.HttpMethod.PUT)
+                                                .and()
+                                                .path("/api/admin/users/*/subscription/extend")
+                                                .filters(f -> f
+                                                                .stripPrefix(0))
+                                                .uri("lb://admin-service"))
+
                                 // Admin User UPDATE (UserService - direct access for CRUD)
                                 .route("admin-user-update", r -> r
                                                 .method(org.springframework.http.HttpMethod.PUT)

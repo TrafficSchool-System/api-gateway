@@ -89,6 +89,15 @@ public class ProductionGatewayConfig {
                                                                                 .setStatuses(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)))
                                                 .uri(userServiceUrl))
 
+                                // Admin Extend Subscription (AdminService)
+                                .route("admin-extend-subscription", r -> r
+                                                .method(org.springframework.http.HttpMethod.PUT)
+                                                .and()
+                                                .path("/api/admin/users/*/subscription/extend")
+                                                .filters(f -> f
+                                                                .stripPrefix(0))
+                                                .uri(adminServiceUrl))
+
                                 // Admin User UPDATE (UserService)
                                 .route("admin-user-update", r -> r
                                                 .method(org.springframework.http.HttpMethod.PUT)
